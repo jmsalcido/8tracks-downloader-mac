@@ -17,6 +17,7 @@
 		C0FC5D19169021CA00F48229 /* ETDMainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C0FC5D18169021CA00F48229 /* ETDMainViewController.xib */; };
 		C0FC5D201690231300F48229 /* YAJL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0FC5D1F1690231300F48229 /* YAJL.framework */; };
 		C0FC5D211690231B00F48229 /* YAJL.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C0FC5D1F1690231300F48229 /* YAJL.framework */; };
+		C0FC5D2516905B7000F48229 /* NSString+ETDString.m in Sources */ = {isa = PBXBuildFile; fileRef = C0FC5D2416905B7000F48229 /* NSString+ETDString.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -50,6 +51,8 @@
 		C0FC5D14169020F700F48229 /* ETDMainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ETDMainViewController.m; sourceTree = "<group>"; };
 		C0FC5D18169021CA00F48229 /* ETDMainViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ETDMainViewController.xib; sourceTree = "<group>"; };
 		C0FC5D1F1690231300F48229 /* YAJL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = YAJL.framework; path = Frameworks/YAJL.framework; sourceTree = "<group>"; };
+		C0FC5D2316905B7000F48229 /* NSString+ETDString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+ETDString.h"; path = "Classes/NSString+ETDString.h"; sourceTree = "<group>"; };
+		C0FC5D2416905B7000F48229 /* NSString+ETDString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+ETDString.m"; path = "Classes/NSString+ETDString.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +108,7 @@
 		C0FC5CEE16901F3E00F48229 /* 8Tracks-Downloader */ = {
 			isa = PBXGroup;
 			children = (
+				C0FC5D2216905B4D00F48229 /* Classes */,
 				C0FC5D0916901FFF00F48229 /* Controllers */,
 				C0FC5D0A16901FFF00F48229 /* Model */,
 				C0FC5D0B16901FFF00F48229 /* View */,
@@ -150,6 +154,15 @@
 				C0FC5D18169021CA00F48229 /* ETDMainViewController.xib */,
 			);
 			path = View;
+			sourceTree = "<group>";
+		};
+		C0FC5D2216905B4D00F48229 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				C0FC5D2316905B7000F48229 /* NSString+ETDString.h */,
+				C0FC5D2416905B7000F48229 /* NSString+ETDString.m */,
+			);
+			name = Classes;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -222,6 +235,7 @@
 				C0FC5CF516901F3E00F48229 /* main.m in Sources */,
 				C0FC5CFC16901F3E00F48229 /* ETDAppDelegate.m in Sources */,
 				C0FC5D16169020F700F48229 /* ETDMainViewController.m in Sources */,
+				C0FC5D2516905B7000F48229 /* NSString+ETDString.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
