@@ -189,7 +189,7 @@
 										</object>
 										<object class="NSProgressIndicator" id="586465727">
 											<reference key="NSNextResponder" ref="757612050"/>
-											<int key="NSvFlags">268</int>
+											<int key="NSvFlags">-2147483380</int>
 											<string key="NSFrame">{{436, 110}, {16, 16}}</string>
 											<reference key="NSSuperview" ref="757612050"/>
 											<reference key="NSWindow"/>
@@ -264,6 +264,7 @@
 							<string key="NSFrame">{{387, 154}, {98, 28}}</string>
 							<reference key="NSSuperview" ref="585301639"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView"/>
 							<string key="NSReuseIdentifierKey">_NS:161</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="44545947">
@@ -553,7 +554,6 @@
 											</object>
 											<int key="NSTVFlags">6</int>
 											<string key="NSMaxSize">{463, 10000000}</string>
-											<string key="NSMinize">{428, 131}</string>
 											<nil key="NSDelegate"/>
 										</object>
 									</array>
@@ -725,6 +725,30 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<reference key="destination" ref="623206094"/>
 					</object>
 					<int key="connectionID">92</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">pathControl</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="662716394"/>
+					</object>
+					<int key="connectionID">168</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">downloadButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="262572071"/>
+					</object>
+					<int key="connectionID">169</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">logDownloadsTextView</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="688529836"/>
+					</object>
+					<int key="connectionID">171</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -2162,7 +2186,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">167</int>
+			<int key="maxID">171</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2182,7 +2206,10 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					</object>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="devAPIKeyTextField">NSTextField</string>
+						<string key="downloadButton">NSButton</string>
+						<string key="logDownloadsTextView">NSTextView</string>
 						<string key="lookUpButton">NSButton</string>
+						<string key="pathControl">NSPathControl</string>
 						<string key="playlistAuthorTextField">NSTextField</string>
 						<string key="playlistDescriptionTextField">NSTextField</string>
 						<string key="playlistImageView">NSImageView</string>
@@ -2196,9 +2223,21 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<string key="name">devAPIKeyTextField</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="downloadButton">
+							<string key="name">downloadButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="logDownloadsTextView">
+							<string key="name">logDownloadsTextView</string>
+							<string key="candidateClassName">NSTextView</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="lookUpButton">
 							<string key="name">lookUpButton</string>
 							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="pathControl">
+							<string key="name">pathControl</string>
+							<string key="candidateClassName">NSPathControl</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="playlistAuthorTextField">
 							<string key="name">playlistAuthorTextField</string>

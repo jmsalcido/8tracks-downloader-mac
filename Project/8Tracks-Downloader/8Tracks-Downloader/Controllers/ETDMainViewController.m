@@ -47,9 +47,17 @@ NSString * const kJSONKeyForUserName = @"slug";
 @synthesize playlistProgressIndicator;
 
 // --------------------------------------------------
+//  DOWNLOAD UI
+// --------------------------------------------------
+@synthesize pathControl;
+@synthesize downloadButton;
+@synthesize logDownloadsTextView;
+
+// --------------------------------------------------
 //  OTHER PROPERTIES
 // --------------------------------------------------
 @synthesize receivedData;
+@synthesize download_size;
 
 @synthesize actionToPerform;
 @synthesize playToken;
@@ -66,27 +74,48 @@ NSString * const kJSONKeyForUserName = @"slug";
     if (self) {
         // Initialization code here.
         actionToPerform = @"";
-        // This must hide the progress indicator, not working, it is weird.
-        [self.playlistProgressIndicator setHidden:YES];
     }
     
     return self;
 }
 
+-(void)awakeFromNib
+{
+    [super awakeFromNib];
+    NSURL *downloadFolderURL = [self downloadDataDirectory];
+    [pathControl setURL:downloadFolderURL];
+}
+
 - (IBAction)lookUpAction:(id)sender
 {
+    BOOL shouldLookUp = NO;
+    NSURL *downloadFolderURL = [self downloadDataDirectory];
+    [pathControl setURL:downloadFolderURL];
     // Some more business rules here please
+    
+    // No empty fields
     if([[self.devAPIKeyTextField stringValue] isEmpty] ||
         [[self.playlistURLTextField stringValue] isEmpty]) {
         
         // Notify the user
-        // It is a rule that every message shall contain a "Title" and a "Description"
-        // We shall send a single NSString, the Title is before the tag [end]
-        // description is after the tag.
         NSString *msg = @"There cannot be empty fields.[end]Playlist URL or Dev API Key fields are empty";
         [self alertUserWithMsg:msg];
         return;
     } else {
+        shouldLookUp = YES;
+    }
+    
+    //Valid URL
+    if([self validateURLString:[self.playlistURLTextField stringValue]]) {
+        shouldLookUp = YES;
+    } else {
+        // Notify the user
+        NSString *msg = @"Playlist URL Field is wrong.[end]Verify and re-verify that the playlist URL is OK.";
+        [self alertUserWithMsg:msg];
+        return;
+    }
+    
+    if(shouldLookUp) {
         // Look Up Button shall be disabled (only 1 request per click)
         [self.lookUpButton setEnabled:NO];
         
@@ -96,6 +125,10 @@ NSString * const kJSONKeyForUserName = @"slug";
         
         // Start loading data.
         [self lookUp];
+    } else {
+        // Notify the user that something went VERY wrong
+        NSString *msg = @"Woops![end]Something went very wrong dude. Contact someone!.";
+        [self alertUserWithMsg:msg];
     }
 }
 
@@ -111,8 +144,13 @@ NSString * const kJSONKeyForUserName = @"slug";
     [self startLoadingPlayTokenWithDevAPIKey:[devAPIKeyTextField stringValue]];
 }
 
+
 -(void)alertUserWithMsg:(NSString *)msg
 {
+    // It is a rule that every message shall contain a "Title" and a "Description"
+    // We shall send a single NSString, the Title is before the tag [end]
+    // description is after the tag.
+    
     // NSArray that contains the "Title" and the "Description"
     NSArray *msgArray = [msg componentsSeparatedByString:@"[end]"];
     
@@ -127,7 +165,35 @@ NSString * const kJSONKeyForUserName = @"slug";
     
     // This is to call the dialog as a SHEET MODAL DIALOG, not a MODAL ONE (ugly)
     [alertView beginSheetModalForWindow:self.window modalDelegate:self didEndSelector:nil contextInfo:nil];
+}
+
+-(BOOL)validateURLString:(NSString *)stringURL
+{
+    // HOW:
+    // Shit.
     
+    BOOL flag = NO;
+    
+    NSLog(@"startsAt:%ld, endsAt:%ld", [stringURL rangeOfString:@"http://"].location, [stringURL rangeOfString:@"http://"].length);
+    
+    // First lets check if the stringURL is a call to HTTP
+    if([stringURL rangeOfString:@"http://"].location != NSNotFound) {
+        flag = YES;
+    } else {
+        return NO;
+    }
+    
+    // Then check if the domain is 8tracks.com
+    NSInteger substringStart = [stringURL rangeOfString:@"http://"].length;
+    stringURL = [stringURL substringFromIndex:substringStart];
+    
+    NSArray *componentsArray = [stringURL componentsSeparatedByString:@"/"];
+    if([[componentsArray objectAtIndex:0] isEqualToString:@"8tracks.com"]) {
+        flag = YES;
+    } else {
+        return NO;
+    }
+    return flag;
 }
 
 -(void)updateUI:(id)object
@@ -155,7 +221,13 @@ NSString * const kJSONKeyForUserName = @"slug";
     [self.lookUpButton setEnabled:YES];
 }
 
-#pragma mark String Methods
+#pragma mark Utility Methods
+-(NSURL *)downloadDataDirectory
+{
+    NSFileManager *sharedFileManager = [NSFileManager defaultManager];
+    NSArray *possibleURLs = [sharedFileManager URLsForDirectory:NSDownloadsDirectory inDomains:NSUserDomainMask];
+    return [possibleURLs objectAtIndex:0];
+}
 
 -(NSString *)obtainPlaylistIdWithHTMLString:(NSString *)HTMLString
 {
@@ -258,6 +330,12 @@ NSString * const kJSONKeyForUserName = @"slug";
     // This method is called when the server has determined that it
     // has enough information to create the NSURLResponse.
     [receivedData setLength:0];
+    NSHTTPURLResponse *responseHTTP = (NSHTTPURLResponse *)response;
+    NSInteger statusCode = [responseHTTP statusCode];
+    NSInteger STATUS_CODE_OK = 200;
+    if(statusCode == STATUS_CODE_OK) {
+        download_size = [responseHTTP expectedContentLength];
+    }
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
@@ -265,6 +343,8 @@ NSString * const kJSONKeyForUserName = @"slug";
     // Append the new data to receivedData.
     // receivedData is an instance variable declared elsewhere.
     [receivedData appendData:data];
+    
+    // When receiving data, we shall show the user some progress... or something.
 }
 
 - (void)connection:(NSURLConnection *)connection

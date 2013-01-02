@@ -49,9 +49,17 @@ extern NSString * const kJSONKeyForUserName;
 @property (strong) IBOutlet NSProgressIndicator *playlistProgressIndicator;
 
 // --------------------------------------------------
+//  DOWNLOAD UI
+// --------------------------------------------------
+@property (strong) IBOutlet NSPathControl *pathControl;
+@property (strong) IBOutlet NSButton *downloadButton;
+@property (strong) IBOutlet NSTextView *logDownloadsTextView;
+
+// --------------------------------------------------
 //  OTHER PROPERTIES
 // --------------------------------------------------
 @property (strong) NSMutableData *receivedData;
+@property NSInteger download_size;
 
 @property (strong) NSString *actionToPerform;
 @property (strong) NSString *playToken;
