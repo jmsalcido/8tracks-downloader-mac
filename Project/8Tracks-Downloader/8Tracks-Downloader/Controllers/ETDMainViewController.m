@@ -186,8 +186,9 @@ NSString * const kJSONKeyForUserName = @"slug";
     // Then check if the domain is 8tracks.com
     NSInteger substringStart = [stringURL rangeOfString:@"http://"].length;
     stringURL = [stringURL substringFromIndex:substringStart];
-    
     NSArray *componentsArray = [stringURL componentsSeparatedByString:@"/"];
+    
+    // Domain is always at the first element.
     if([[componentsArray objectAtIndex:0] isEqualToString:@"8tracks.com"]) {
         flag = YES;
     } else {
@@ -198,21 +199,31 @@ NSString * const kJSONKeyForUserName = @"slug";
 
 -(void)updateUI:(id)object
 {
-    // Convert the object to the desired type
-    // jmsalcido: I was thinking bout using a "model" to follow the MVC pattern
-    // jmsalcido: but it is... working.
-    NSDictionary *dict = object;
-    
-    // Obtain the cool properties (using constants always)
-    self.playlistNameTextField.stringValue = [dict valueForKey:kJSONKeyForName];
-    self.playlistDescriptionTextField.stringValue = [dict valueForKey:kJSONKeyForDescription];
-    self.playlistAuthorTextField.stringValue = [[dict valueForKey:kJSONKeyForUser] valueForKey:kJSONKeyForUserName];
-    
-    // Create the NSURL with the thumbImageURL
-    NSURL *URLImage = [[NSURL alloc] initWithString:[[dict valueForKey:kJSONKeyForCoverURL] valueForKey:kJSONKeyForCoverURLPx]];
-    
-    // Retrieve the Image from the interkatz
-    [self startLoadingDataWithURL:URLImage action:kActionObtainImageData];
+    // If object == nil, then something went wrong.
+    if(object != nil) {
+        // Convert the object to the desired type
+        // jmsalcido: I was thinking bout using a "model" to follow the MVC pattern
+        // jmsalcido: but it is... working.
+        NSDictionary *dict = object;
+        
+        // Obtain the cool properties (using constants always)
+        self.playlistNameTextField.stringValue = [dict valueForKey:kJSONKeyForName];
+        self.playlistDescriptionTextField.stringValue = [dict valueForKey:kJSONKeyForDescription];
+        self.playlistAuthorTextField.stringValue = [[dict valueForKey:kJSONKeyForUser] valueForKey:kJSONKeyForUserName];
+        
+        // Create the NSURL with the thumbImageURL
+        NSURL *URLImage = [[NSURL alloc] initWithString:[[dict valueForKey:kJSONKeyForCoverURL] valueForKey:kJSONKeyForCoverURLPx]];
+        
+        // Retrieve the Image from the interkatz
+        [self startLoadingDataWithURL:URLImage action:kActionObtainImageData];
+        
+        // Enable the Download Button.
+        [self.downloadButton setEnabled:YES];
+    } else {
+        
+        // Download button not-enabled when the URL is wrong.
+        [self.downloadButton setEnabled:NO];
+    }
     
     // Stop animation for the Progress Indicator and hide it, also
     // enable the Look Up Button again!
@@ -231,26 +242,51 @@ NSString * const kJSONKeyForUserName = @"slug";
 
 -(NSString *)obtainPlaylistIdWithHTMLString:(NSString *)HTMLString
 {
-    // Position of the chunk of data that contains playlistId
-    NSInteger position = 1;
-    
-    // Var playlistId is appended after this string
-    NSString *stringToSearch = @"mixes/";
-    
-    // Split the HTMLString into n chunks, playlistId is at position
-    NSArray *arrayContainingPlaylistId = [HTMLString componentsSeparatedByString:stringToSearch];
-    
-    // Var playlistId is appended after this string
-    stringToSearch = @"/";
-    
-    // Split the chunk into n objects
-    arrayContainingPlaylistId = [[arrayContainingPlaylistId objectAtIndex:position] componentsSeparatedByString:stringToSearch];
-    
-    // Var playlistId is at this position
-    position = 0;
-    
-    // Obtain playlistId
-    return [arrayContainingPlaylistId objectAtIndex:position];
+    // Verify if the playlist at least exist.
+    if([self isHTMLDataOKFromString:HTMLString]) {
+        // Position of the chunk of data that contains playlistId
+        NSInteger position = 1;
+        
+        // Var playlistId is appended after this string
+        NSString *stringToSearch = @"mixes/";
+        
+        // Split the HTMLString into n chunks, playlistId is at position
+        NSArray *arrayContainingPlaylistId = [HTMLString componentsSeparatedByString:stringToSearch];
+        
+        // Var playlistId is appended after this string
+        stringToSearch = @"/";
+        
+        // Split the chunk into n objects
+        arrayContainingPlaylistId = [[arrayContainingPlaylistId objectAtIndex:position] componentsSeparatedByString:stringToSearch];
+        
+        // Var playlistId is at this position
+        position = 0;
+        
+        // Obtain playlistId
+        return [arrayContainingPlaylistId objectAtIndex:position];
+    } else {
+        return nil;
+    }
+}
+
+-(BOOL)isHTMLDataOKFromString:(NSString *)HTMLString
+{
+    // >2013
+    // >not using XML parses.
+    NSInteger start = [HTMLString rangeOfString:@"<title>"].length;
+    NSInteger end = [HTMLString rangeOfString:@"</title>"].location;
+    NSRange range = NSMakeRange(start, end);
+    NSString *substring = [HTMLString substringWithRange:range];
+    if([substring rangeOfString:@"404"].location != NSNotFound) {
+        return NO;
+    } else {
+        // Must search for the word mixes/ at the url.
+        if([HTMLString rangeOfString:@"mixes/"].location != NSNotFound) {
+            return YES;
+        } else {
+            return NO;
+        }
+    }
 }
 
 #pragma mark startLoading
@@ -385,8 +421,15 @@ NSString * const kJSONKeyForUserName = @"slug";
         HTMLData = dataString;
         playlistId = [self obtainPlaylistIdWithHTMLString:dataString];
         
-        // Also, startLoadingPlaylistData
-        [self startLoadingPlaylistDataWithId:playlistId devAPIKey:[devAPIKeyTextField stringValue]];
+        if(playlistId == nil) {
+            // PlaylistId is wrong
+            NSString *alertString = @"Playlist URL is not loading[end]Verify that the playlist exist.";
+            [self alertUserWithMsg:alertString];
+            [self updateUI:nil];
+        } else {
+            // Lets startLoadingPlaylistData
+            [self startLoadingPlaylistDataWithId:playlistId devAPIKey:[devAPIKeyTextField stringValue]];
+        }
         
     } else if([actionToPerform isEqualToString:kActionObtainPlaylistData]) {
         
