@@ -142,30 +142,6 @@ NSString * const kJSONKeyForUserName = @"slug";
     [self startLoadingPlayTokenWithDevAPIKey:[devAPIKeyTextField stringValue]];
 }
 
--(BOOL)validateURLString:(NSString *)stringURL
-{
-    // HOW:
-    // Shit.
-    // NSLog(@"startsAt:%ld, endsAt:%ld", [stringURL rangeOfString:@"http://"].location, [stringURL rangeOfString:@"http://"].length);
-    
-    // First lets check if the stringURL is a call to HTTP
-    if([stringURL rangeOfString:@"http://"].location == NSNotFound) {
-        return NO;
-    }
-    
-    // Then check if the domain is 8tracks.com
-    NSInteger substringStart = [stringURL rangeOfString:@"http://"].length;
-    stringURL = [stringURL substringFromIndex:substringStart];
-    NSArray *componentsArray = [stringURL componentsSeparatedByString:@"/"];
-    
-    // Domain is always at the first element.
-    if([[componentsArray objectAtIndex:0] isEqualToString:@"8tracks.com"]) {
-        return YES;
-    } else {
-        return NO;
-    }
-}
-
 -(void)updateUI:(id)object
 {
     // If object == nil, then something went wrong.
@@ -224,6 +200,30 @@ NSString * const kJSONKeyForUserName = @"slug";
     [alertView beginSheetModalForWindow:self.window modalDelegate:self didEndSelector:nil contextInfo:nil];
 }
 
+-(BOOL)validateURLString:(NSString *)stringURL
+{
+    // HOW:
+    // Shit.
+    // NSLog(@"startsAt:%ld, endsAt:%ld", [stringURL rangeOfString:@"http://"].location, [stringURL rangeOfString:@"http://"].length);
+    
+    // First lets check if the stringURL is a call to HTTP
+    if([stringURL rangeOfString:@"http://"].location == NSNotFound) {
+        return NO;
+    }
+    
+    // Then check if the domain is 8tracks.com
+    NSInteger substringStart = [stringURL rangeOfString:@"http://"].length;
+    stringURL = [stringURL substringFromIndex:substringStart];
+    NSArray *componentsArray = [stringURL componentsSeparatedByString:@"/"];
+    
+    // Domain is always at the first element.
+    if([[componentsArray objectAtIndex:0] isEqualToString:@"8tracks.com"]) {
+        return YES;
+    } else {
+        return NO;
+    }
+}
+
 -(NSURL *)downloadDataDirectory
 {
     // Create shared File Manager
@@ -239,50 +239,31 @@ NSString * const kJSONKeyForUserName = @"slug";
 -(NSString *)obtainPlaylistIdWithHTMLString:(NSString *)HTMLString
 {
     // Verify if the playlist at least exist.
-    if([self isHTMLDataOKFromString:HTMLString]) {
-        // Position of the chunk of data that contains playlistId
-        NSInteger position = 1;
-        
-        // Var playlistId is appended after this string
-        NSString *stringToSearch = @"mixes/";
-        
-        // Split the HTMLString into n chunks, playlistId is at position
-        NSArray *arrayContainingPlaylistId = [HTMLString componentsSeparatedByString:stringToSearch];
-        
-        // Var playlistId is appended after this string
-        stringToSearch = @"/";
-        
-        // Split the chunk into n objects
-        arrayContainingPlaylistId = [[arrayContainingPlaylistId objectAtIndex:position] componentsSeparatedByString:stringToSearch];
-        
-        // Var playlistId is at this position
-        position = 0;
-        
-        // Obtain playlistId
-        return [arrayContainingPlaylistId objectAtIndex:position];
-    } else {
+    // Position of the chunk of data that contains playlistId
+    NSInteger position = 1;
+    
+    // Var playlistId is appended after this string
+    NSString *stringToSearch = @"mixes/";
+    
+    // Split the HTMLString into n chunks, playlistId is at position
+    NSArray *arrayContainingPlaylistId = [HTMLString componentsSeparatedByString:stringToSearch];
+    
+    // If the word "mixes/" is at the HTML String, it is a playlist if not, then gtfo. 
+    if(arrayContainingPlaylistId.count <= 1) {
         return nil;
     }
-}
-
--(BOOL)isHTMLDataOKFromString:(NSString *)HTMLString
-{
-    // >2013
-    // >not using XML parses.
-    NSInteger start = [HTMLString rangeOfString:@"<title>"].length;
-    NSInteger end = [HTMLString rangeOfString:@"</title>"].location;
-    NSRange range = NSMakeRange(start, end);
-    NSString *substring = [HTMLString substringWithRange:range];
-    if([substring rangeOfString:@"404"].location != NSNotFound) {
-        return NO;
-    } else {
-        // Must search for the word mixes/ at the url.
-        if([HTMLString rangeOfString:@"mixes/"].location != NSNotFound) {
-            return YES;
-        } else {
-            return NO;
-        }
-    }
+    
+    // Var playlistId is appended after this string
+    stringToSearch = @"/";
+    
+    // Split the chunk into n objects
+    arrayContainingPlaylistId = [[arrayContainingPlaylistId objectAtIndex:position] componentsSeparatedByString:stringToSearch];
+    
+    // Var playlistId is at this position
+    position = 0;
+    
+    // Obtain playlistId
+    return [arrayContainingPlaylistId objectAtIndex:position];
 }
 
 #pragma mark startLoading
@@ -367,6 +348,13 @@ NSString * const kJSONKeyForUserName = @"slug";
     NSInteger STATUS_CODE_OK = 200;
     if(statusCode == STATUS_CODE_OK) {
         download_size = [responseHTTP expectedContentLength];
+    }
+    if(statusCode == 404) {
+        NSLog(@"404");
+        [connection cancel];
+        NSString *alert_message = @"Error 404[end]The playlist you searched for was not found.";
+        [self alertUserWithMsg:alert_message];
+        [self updateUI:nil];
     }
 }
 

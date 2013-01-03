@@ -34,6 +34,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C056A68C16955584007A2B1A /* 8Tracks-Downloader.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "8Tracks-Downloader.entitlements"; sourceTree = "<group>"; };
 		C0FC5CE416901F3E00F48229 /* 8Tracks-Downloader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "8Tracks-Downloader.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0FC5CE816901F3E00F48229 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		C0FC5CEB16901F3E00F48229 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -108,6 +109,7 @@
 		C0FC5CEE16901F3E00F48229 /* 8Tracks-Downloader */ = {
 			isa = PBXGroup;
 			children = (
+				C056A68C16955584007A2B1A /* 8Tracks-Downloader.entitlements */,
 				C0FC5D2216905B4D00F48229 /* Classes */,
 				C0FC5D0916901FFF00F48229 /* Controllers */,
 				C0FC5D0A16901FFF00F48229 /* Model */,
@@ -375,6 +377,7 @@
 				C0FC5D0416901F3E00F48229 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
