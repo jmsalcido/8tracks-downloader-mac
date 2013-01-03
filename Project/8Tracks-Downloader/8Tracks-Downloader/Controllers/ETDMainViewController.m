@@ -89,8 +89,6 @@ NSString * const kJSONKeyForUserName = @"slug";
 - (IBAction)lookUpAction:(id)sender
 {
     BOOL shouldLookUp = NO;
-    NSURL *downloadFolderURL = [self downloadDataDirectory];
-    [pathControl setURL:downloadFolderURL];
     // Some more business rules here please
     
     // No empty fields
@@ -144,42 +142,14 @@ NSString * const kJSONKeyForUserName = @"slug";
     [self startLoadingPlayTokenWithDevAPIKey:[devAPIKeyTextField stringValue]];
 }
 
-
--(void)alertUserWithMsg:(NSString *)msg
-{
-    // It is a rule that every message shall contain a "Title" and a "Description"
-    // We shall send a single NSString, the Title is before the tag [end]
-    // description is after the tag.
-    
-    // NSArray that contains the "Title" and the "Description"
-    NSArray *msgArray = [msg componentsSeparatedByString:@"[end]"];
-    
-    // Alloc memory for our NSAlert (not MODAL, is a SHEET-MODAL DIALOG)
-    NSAlert *alertView = [[NSAlert alloc] init];
-    
-    // Set all the dialog properties
-    [alertView addButtonWithTitle:@"OK"];
-    [alertView setMessageText:[msgArray objectAtIndex:0]]; // this is why title is FIRST
-    [alertView setAlertStyle:NSWarningAlertStyle];
-    [alertView setInformativeText:[msgArray objectAtIndex:1]]; // this is why description is SECOND
-    
-    // This is to call the dialog as a SHEET MODAL DIALOG, not a MODAL ONE (ugly)
-    [alertView beginSheetModalForWindow:self.window modalDelegate:self didEndSelector:nil contextInfo:nil];
-}
-
 -(BOOL)validateURLString:(NSString *)stringURL
 {
     // HOW:
     // Shit.
-    
-    BOOL flag = NO;
-    
-    NSLog(@"startsAt:%ld, endsAt:%ld", [stringURL rangeOfString:@"http://"].location, [stringURL rangeOfString:@"http://"].length);
+    // NSLog(@"startsAt:%ld, endsAt:%ld", [stringURL rangeOfString:@"http://"].location, [stringURL rangeOfString:@"http://"].length);
     
     // First lets check if the stringURL is a call to HTTP
-    if([stringURL rangeOfString:@"http://"].location != NSNotFound) {
-        flag = YES;
-    } else {
+    if([stringURL rangeOfString:@"http://"].location == NSNotFound) {
         return NO;
     }
     
@@ -190,11 +160,10 @@ NSString * const kJSONKeyForUserName = @"slug";
     
     // Domain is always at the first element.
     if([[componentsArray objectAtIndex:0] isEqualToString:@"8tracks.com"]) {
-        flag = YES;
+        return YES;
     } else {
         return NO;
     }
-    return flag;
 }
 
 -(void)updateUI:(id)object
@@ -233,10 +202,37 @@ NSString * const kJSONKeyForUserName = @"slug";
 }
 
 #pragma mark Utility Methods
+-(void)alertUserWithMsg:(NSString *)msg
+{
+    // It is a rule that every message shall contain a "Title" and a "Description"
+    // We shall send a single NSString, the Title is before the tag [end]
+    // description is after the tag.
+    
+    // NSArray that contains the "Title" and the "Description"
+    NSArray *msgArray = [msg componentsSeparatedByString:@"[end]"];
+    
+    // Alloc memory for our NSAlert (not MODAL, is a SHEET-MODAL DIALOG)
+    NSAlert *alertView = [[NSAlert alloc] init];
+    
+    // Set all the dialog properties
+    [alertView addButtonWithTitle:@"OK"];
+    [alertView setMessageText:[msgArray objectAtIndex:0]]; // this is why title is FIRST
+    [alertView setAlertStyle:NSWarningAlertStyle];
+    [alertView setInformativeText:[msgArray objectAtIndex:1]]; // this is why description is SECOND
+    
+    // This is to call the dialog as a SHEET MODAL DIALOG, not a MODAL ONE (ugly)
+    [alertView beginSheetModalForWindow:self.window modalDelegate:self didEndSelector:nil contextInfo:nil];
+}
+
 -(NSURL *)downloadDataDirectory
 {
+    // Create shared File Manager
     NSFileManager *sharedFileManager = [NSFileManager defaultManager];
+    
+    // Obtain the possible URL with the constant NSDownloadsDirectory in the User domain (/User/username)
     NSArray *possibleURLs = [sharedFileManager URLsForDirectory:NSDownloadsDirectory inDomains:NSUserDomainMask];
+    
+    // Return path.
     return [possibleURLs objectAtIndex:0];
 }
 
